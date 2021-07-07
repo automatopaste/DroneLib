@@ -2,7 +2,7 @@
 	"id":"DroneLib",
 	"name":"DroneLib",
 	"author":"tomatopaste",
-	"version":"0.1.1",
+	"version":"0.1.2",
 	"description":"A collection of drone related utilities for AI and shipsystems. An example system structure has been included.",
 	"gameVersion":"0.95a-RC15",
 	"jars":["jars/DroneLib.jar"],
