@@ -1,0 +1,47 @@
+{
+	"id":"PSE_droneRift",
+	"type":"STAT_MOD",
+	"statsScript":"data.scripts.shipsystems.PSE_DroneRift",
+	"aiType":"CUSTOM",
+	"aiScript":"data.scripts.shipsystems.ai.PSE_DroneRiftSystemAI", #empty
+	
+	"dl_droneVariant":"PSE_rift_wing",
+	
+	"dl_launchSpeed":150,
+	"dl_launchDelay":1,
+	"dl_maxDrones":4,
+	"dl_forgeCooldown":25,
+	"dl_droneBehavior":[ #one curly bracket object required per drone and droneIndex field is mandatory
+		{"droneIndex":[0],
+		 "fieldOrbitRadius":20,
+		 "fieldOrbitSpeed":20,
+		 "defenceOrbitAngle":40,
+		 "defenceFacing":25,
+		 "defenceOrbitRadius":0, # plus ship radius
+		},
+		{"droneIndex":[1],
+		 "fieldOrbitRadius":20,
+		 "fieldOrbitSpeed":-20,
+		 "defenceOrbitAngle":-40,
+		 "defenceFacing":-25,
+		 "defenceOrbitRadius":0, # plus ship radius
+		},
+		{"droneIndex":[2],
+		 "fieldOrbitRadius":20,
+		 "fieldOrbitSpeed":20,
+		 "defenceOrbitAngle":120,
+		 "defenceFacing":60,
+		 "defenceOrbitRadius":60, # plus ship radius
+		},
+		{"droneIndex":[3],
+		 "fieldOrbitRadius":20,
+		 "fieldOrbitSpeed":-20,
+		 "defenceOrbitAngle":-120,
+		 "defenceFacing":-60,
+		 "defenceOrbitRadius":60, # plus ship radius
+		},
+	],
+	
+	"useSound":"drone_launch",
+	"outOfUsesSound":"gun_out_of_ammo",
+}
