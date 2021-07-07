@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import data.scripts.ai.dl_BaseDroneAI;
-import data.scripts.ai.example.PSE_DroneRiftDroneAI;
+import data.scripts.ai.example.dl_DroneRiftDroneAI;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.shipsystems.dl_BaseDroneSystem;
 import org.lazywizard.lazylib.MathUtils;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class PSE_DroneRift extends dl_BaseDroneSystem {
+public class dl_DroneRift extends dl_BaseDroneSystem {
     public static final String UNIQUE_SYSTEM_PREFIX = "PSE_droneRift";
 
     private static final float FIELD_EFFECT_RADIUS = 1000f;
@@ -38,7 +38,7 @@ public class PSE_DroneRift extends dl_BaseDroneSystem {
     private final IntervalUtil missileParticleInterval = new IntervalUtil(0.6f, 0.6f);
     //private PSE_RingVisual visual;
 
-    public PSE_DroneRift() {
+    public dl_DroneRift() {
         systemID = UNIQUE_SYSTEM_PREFIX;
 
         loadSpecData();
@@ -50,7 +50,7 @@ public class PSE_DroneRift extends dl_BaseDroneSystem {
     }
 
     private RiftDroneOrders getNextDroneOrder() {
-        if (droneOrders.ordinal() == PSE_DroneRift.RiftDroneOrders.values().length - 1) {
+        if (droneOrders.ordinal() == dl_DroneRift.RiftDroneOrders.values().length - 1) {
             return RiftDroneOrders.values()[0];
         }
         return RiftDroneOrders.values()[droneOrders.ordinal() + 1];
@@ -185,10 +185,10 @@ public class PSE_DroneRift extends dl_BaseDroneSystem {
                         if (missile.getSource().equals(ship)) {
                             missile.setEccmChanceBonus(100f);
                             missile.setEccmChanceOverride(100f);
-                            missile.getSource().getMutableStats().getMissileAccelerationBonus().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                            missile.getSource().getMutableStats().getMissileTurnAccelerationBonus().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                            missile.getSource().getMutableStats().getMissileMaxSpeedBonus().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                            missile.getSource().getMutableStats().getMissileMaxTurnRateBonus().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                            missile.getSource().getMutableStats().getMissileAccelerationBonus().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                            missile.getSource().getMutableStats().getMissileTurnAccelerationBonus().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                            missile.getSource().getMutableStats().getMissileMaxSpeedBonus().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                            missile.getSource().getMutableStats().getMissileMaxTurnRateBonus().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
 
                             Color c = (ship.getOwner() == this.ship.getOwner()) ? FIELD_EFFECT_COLOUR : FIELD_ENEMY_EFFECT_COLOUR;
 
@@ -215,10 +215,10 @@ public class PSE_DroneRift extends dl_BaseDroneSystem {
                     if (!ship.isFighter() || ship.isHulk() || !ship.isAlive() || ship.getHullSpec().getHullId().contains("_drone")) continue;
 
                     if (MathUtils.getDistanceSquared(this.ship.getLocation(), ship.getLocation()) < FIELD_EFFECT_RADIUS * FIELD_EFFECT_RADIUS) {
-                        ship.getMutableStats().getTurnAcceleration().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                        ship.getMutableStats().getMaxSpeed().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                        ship.getMutableStats().getAcceleration().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
-                        ship.getMutableStats().getMaxTurnRate().modifyPercent(PSE_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                        ship.getMutableStats().getTurnAcceleration().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                        ship.getMutableStats().getMaxSpeed().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                        ship.getMutableStats().getAcceleration().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
+                        ship.getMutableStats().getMaxTurnRate().modifyPercent(dl_DroneRift.class.toString(), FIELD_EFFECT_BONUS_PERCENT);
 
                         Color c = (ship.getOwner() == this.ship.getOwner()) ? FIELD_EFFECT_COLOUR : FIELD_ENEMY_EFFECT_COLOUR;
 
@@ -254,7 +254,7 @@ public class PSE_DroneRift extends dl_BaseDroneSystem {
 
     @Override
     public dl_BaseDroneAI getNewAIInstance(dl_DroneAPI spawnedDrone, dl_BaseDroneSystem baseDroneSystem) {
-        return new PSE_DroneRiftDroneAI(spawnedDrone, baseDroneSystem);
+        return new dl_DroneRiftDroneAI(spawnedDrone, baseDroneSystem);
     }
 
     public RiftDroneOrders getDroneOrders() {

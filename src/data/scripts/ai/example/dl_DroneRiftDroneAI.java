@@ -4,7 +4,7 @@ import com.fs.starfarer.api.loading.WeaponSlotAPI;
 import data.scripts.ai.dl_BaseDroneAI;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.shipsystems.dl_BaseDroneSystem;
-import data.scripts.shipsystems.example.PSE_DroneRift;
+import data.scripts.shipsystems.example.dl_DroneRift;
 import data.scripts.util.dl_DroneAIUtils;
 import data.scripts.util.dl_SpecLoadingUtils;
 import org.lazywizard.lazylib.MathUtils;
@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
 
-public class PSE_DroneRiftDroneAI extends dl_BaseDroneAI {
+public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
     private final float[] fieldOrbitRadiusArray;
     private final float[] fieldOrbitSpeedArray;
     private final float[] defenceOrbitAngleArray;
@@ -24,23 +24,23 @@ public class PSE_DroneRiftDroneAI extends dl_BaseDroneAI {
     private float defenceFacing;
     private float defenceOrbitRadius;
     private WeaponSlotAPI landingSlot;
-    private PSE_DroneRift.RiftDroneOrders orders;
+    private dl_DroneRift.RiftDroneOrders orders;
 
-    public PSE_DroneRiftDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSystem baseDroneSystem) {
+    public dl_DroneRiftDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSystem baseDroneSystem) {
         super(passedDrone, baseDroneSystem);
 
-        fieldOrbitRadiusArray = dl_SpecLoadingUtils.PSE_RiftSpecLoading.getFieldOrbitRadiusArray();
-        fieldOrbitSpeedArray = dl_SpecLoadingUtils.PSE_RiftSpecLoading.getFieldOrbitSpeedArray();
-        defenceOrbitAngleArray = dl_SpecLoadingUtils.PSE_RiftSpecLoading.getDefenceOrbitAngleArray();
-        defenceFacingArray = dl_SpecLoadingUtils.PSE_RiftSpecLoading.getDefenceFacingArray();
-        defenceOrbitRadiusArray = dl_SpecLoadingUtils.PSE_RiftSpecLoading.getDefenceOrbitRadiusArray();
+        fieldOrbitRadiusArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getFieldOrbitRadiusArray();
+        fieldOrbitSpeedArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getFieldOrbitSpeedArray();
+        defenceOrbitAngleArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceOrbitAngleArray();
+        defenceFacingArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceFacingArray();
+        defenceOrbitRadiusArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceOrbitRadiusArray();
     }
 
     @Override
     public void advance(float amount) {
         super.advance(amount);
 
-        PSE_DroneRift droneRiftSystem = (PSE_DroneRift) engine.getCustomData().get(getUniqueSystemID());
+        dl_DroneRift droneRiftSystem = (dl_DroneRift) engine.getCustomData().get(getUniqueSystemID());
         if (droneRiftSystem == null) {
             return;
         }

@@ -1,2 +1,2 @@
 id,variant,tags,tier,rarity,fleet pts,op cost,formation,range,attackRunRange,attackPositionOffset,num,role,role desc,refit,base value,,,,,,,,,,,,,number
-PSE_rift_wing,PSE_rift_Drone,"no_drop, no_sell, PSE_drone",,0,0,,V,0,0,,1,INTERCEPTOR,Defence,0,100,,,,,,,,,,,,,
+dl_rift_wing,dl_rift_Drone,"no_drop, no_sell, PSE_drone",,0,0,,V,0,0,,1,INTERCEPTOR,Defence,0,100,,,,,,,,,,,,,

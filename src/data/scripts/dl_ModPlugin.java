@@ -17,7 +17,7 @@ public class dl_ModPlugin extends BaseModPlugin {
 
         //try/catch block for each system with a loadJSON method
         try {
-            dl_SpecLoadingUtils.PSE_RiftSpecLoading.loadJSON();
+            dl_SpecLoadingUtils.dl_RiftSpecLoading.loadJSON();
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }

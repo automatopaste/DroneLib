@@ -1,11 +1,11 @@
 {
-	"id":"PSE_droneRift",
+	"id":"dl_droneRift",
 	"type":"STAT_MOD",
-	"statsScript":"data.scripts.shipsystems.PSE_DroneRift",
+	"statsScript":"data.scripts.shipsystems.example.dl_DroneRift",
 	"aiType":"CUSTOM",
-	"aiScript":"data.scripts.shipsystems.ai.PSE_DroneRiftSystemAI", #empty
+	"aiScript":"data.scripts.shipsystems.ai.dl_DroneRiftSystemAI", #empty
 	
-	"dl_droneVariant":"PSE_rift_wing",
+	"dl_droneVariant":"dl_rift_wing",
 	
 	"dl_launchSpeed":150,
 	"dl_launchDelay":1,
