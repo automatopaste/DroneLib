@@ -10,7 +10,7 @@ import com.fs.starfarer.api.mission.FleetSide;
 import com.fs.starfarer.api.util.IntervalUtil;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.shipsystems.dl_BaseDroneSystem;
-import data.scripts.util.dl_CombatBarUI;
+import data.scripts.util.dl_CombatUI;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
@@ -23,7 +23,7 @@ import java.util.Random;
  * @author tomatopaste
  * one of these should be instantiated by every instance of a DroneLib shipsystem, used to manage launching, forging and ui
  */
-public class dl_DroneManagerPlugin extends BaseEveryFrameCombatPlugin {
+public class dl_DroneLaunchManager extends BaseEveryFrameCombatPlugin {
     public static final String LAUNCH_DELAY_STAT_KEY = "dl_launchDelayStatKey";
     public static final String REGEN_DELAY_STAT_KEY = "dl_regenDelayStatKey";
 
@@ -42,7 +42,7 @@ public class dl_DroneManagerPlugin extends BaseEveryFrameCombatPlugin {
     private float forgeCooldownRemaining;
     private float forgeCooldown;
 
-    public dl_DroneManagerPlugin(dl_BaseDroneSystem baseSystem) {
+    public dl_DroneLaunchManager(dl_BaseDroneSystem baseSystem) {
         if (baseSystem != null) {
             baseDroneSystem = baseSystem;
         } else {
@@ -59,7 +59,7 @@ public class dl_DroneManagerPlugin extends BaseEveryFrameCombatPlugin {
         forgeCooldown = baseDroneSystem.forgeCooldown;
         forgeCooldownRemaining = forgeCooldown;
 
-        maxReserveDroneCount = baseSystem.maxDeployedDrones;
+        maxReserveDroneCount = baseSystem.maxReserveDrones;
 
         this.droneVariant = baseDroneSystem.droneVariant;
         this.maxDeployedDrones = baseDroneSystem.maxDeployedDrones;
@@ -73,7 +73,7 @@ public class dl_DroneManagerPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        dl_CombatBarUI.drawSecondUnlimitedInterfaceStatusBar(
+        dl_CombatUI.drawSecondUnlimitedInterfaceStatusBar(
                 ship,
                 forgeCooldownRemaining/ forgeCooldown,
                 null,
@@ -206,7 +206,7 @@ public class dl_DroneManagerPlugin extends BaseEveryFrameCombatPlugin {
         VectorUtils.clampLength(launchVelocity, launchSpeed);
         spawnedDrone.getVelocity().set(launchVelocity);
 
-        spawnedDrone.setShipAI(baseDroneSystem.getNewAIInstance(spawnedDrone, baseDroneSystem));
+        spawnedDrone.setShipAI(baseDroneSystem.getNewDroneAIInstance(spawnedDrone, baseDroneSystem));
 
         spawnedDrone.setDroneSource(ship);
         spawnedDrone.setDrone();

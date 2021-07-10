@@ -1,10 +1,11 @@
 package data.scripts.ai.example;
 
+import com.fs.starfarer.api.combat.ShipAIConfig;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
 import data.scripts.ai.dl_BaseDroneAI;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.shipsystems.dl_BaseDroneSystem;
-import data.scripts.shipsystems.example.dl_DroneRift;
+import data.scripts.shipsystems.example.dl_FiverDroneSystem;
 import data.scripts.util.dl_DroneAIUtils;
 import data.scripts.util.dl_SpecLoadingUtils;
 import org.lazywizard.lazylib.MathUtils;
@@ -12,67 +13,79 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
 
-public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
-    private final float[] fieldOrbitRadiusArray;
-    private final float[] fieldOrbitSpeedArray;
+public class dl_FiverDroneAI extends dl_BaseDroneAI {
+    private final float[] shieldOrbitRadiusArray;
+    private final float[] shieldOrbitSpeedArray;
     private final float[] defenceOrbitAngleArray;
     private final float[] defenceFacingArray;
     private final float[] defenceOrbitRadiusArray;
-    private float fieldOrbitAngle;
-    private float fieldOrbitRadius;
+    private float shieldOrbitAngle;
+    private float shieldOrbitRadius;
     private float defenceOrbitAngle;
     private float defenceFacing;
     private float defenceOrbitRadius;
     private WeaponSlotAPI landingSlot;
-    private dl_DroneRift.RiftDroneOrders orders;
+    private dl_FiverDroneSystem.FiverDroneOrders orders;
 
-    public dl_DroneRiftDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSystem baseDroneSystem) {
+    public dl_FiverDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSystem baseDroneSystem) {
         super(passedDrone, baseDroneSystem);
 
-        fieldOrbitRadiusArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getFieldOrbitRadiusArray();
-        fieldOrbitSpeedArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getFieldOrbitSpeedArray();
-        defenceOrbitAngleArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceOrbitAngleArray();
-        defenceFacingArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceFacingArray();
-        defenceOrbitRadiusArray = dl_SpecLoadingUtils.dl_RiftSpecLoading.getDefenceOrbitRadiusArray();
+        shieldOrbitRadiusArray = dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.getshieldOrbitRadiusArray();
+        shieldOrbitSpeedArray = dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.getshieldOrbitSpeedArray();
+        defenceOrbitAngleArray = dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.getDefenceOrbitAngleArray();
+        defenceFacingArray = dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.getDefenceFacingArray();
+        defenceOrbitRadiusArray = dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.getDefenceOrbitRadiusArray();
+    }
+
+    @Override
+    public void setDoNotFireDelay(float amount) {
+
+    }
+
+    @Override
+    public void forceCircumstanceEvaluation() {
+
     }
 
     @Override
     public void advance(float amount) {
         super.advance(amount);
 
-        dl_DroneRift droneRiftSystem = (dl_DroneRift) engine.getCustomData().get(getUniqueSystemID());
-        if (droneRiftSystem == null) {
-            return;
-        }
-        baseDroneSystem = droneRiftSystem;
+        dl_FiverDroneSystem fiverDroneSystem = (dl_FiverDroneSystem) engine.getCustomData().get(getUniqueSystemID());
+        if (fiverDroneSystem == null) return;
+        baseDroneSystem = fiverDroneSystem;
 
         //assign specific values
         droneIndex = baseDroneSystem.getIndex(drone);
 
-        fieldOrbitRadius = fieldOrbitRadiusArray[droneIndex];
-        float fieldOrbitSpeed = fieldOrbitSpeedArray[droneIndex];
+        shieldOrbitRadius = shieldOrbitRadiusArray[droneIndex];
+        float shieldOrbitSpeed = shieldOrbitSpeedArray[droneIndex];
         defenceOrbitAngle = defenceOrbitAngleArray[droneIndex];
         defenceFacing = defenceFacingArray[droneIndex];
         defenceOrbitRadius = defenceOrbitRadiusArray[droneIndex];
 
-        orders = droneRiftSystem.getDroneOrders();
+        orders = fiverDroneSystem.getDroneOrders();
 
         switch (orders) {
             case DEFENCE:
                 List<dl_DroneAPI> deployedDrones = baseDroneSystem.deployedDrones;
                 float angleDivisor = 360f / deployedDrones.size();
-                fieldOrbitAngle = droneIndex * angleDivisor;
+                shieldOrbitAngle = droneIndex * angleDivisor;
 
                 delayBeforeLandingTracker.setElapsed(0f);
 
                 landingSlot = null;
+
+                drone.getShield().toggleOff();
                 break;
-            case ECCM_ARRAY:
+            case SHIELD:
                 delayBeforeLandingTracker.setElapsed(0f);
 
                 landingSlot = null;
 
-                fieldOrbitAngle += fieldOrbitSpeed * amount;
+                shieldOrbitAngle += shieldOrbitSpeed * amount;
+
+                drone.getShield().toggleOn();
                 break;
             case RECALL:
                 dl_DroneAIUtils.attemptToLand(ship, drone, amount, delayBeforeLandingTracker, engine);
@@ -80,6 +93,8 @@ public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
                 if (landingSlot == null) {
                     landingSlot = baseDroneSystem.getPlugin().getLandingBayWeaponSlotAPI();
                 }
+
+                drone.getShield().toggleOff();
                 break;
         }
 
@@ -89,6 +104,21 @@ public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
         if (movementTargetLocation != null) {
             dl_DroneAIUtils.move(drone, drone.getFacing(), movementTargetLocation);
         }
+    }
+
+    @Override
+    public boolean needsRefit() {
+        return false;
+    }
+
+    @Override
+    public void cancelCurrentManeuver() {
+
+    }
+
+    @Override
+    public ShipAIConfig getConfig() {
+        return null;
     }
 
     @Override
@@ -103,9 +133,9 @@ public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
                 radius = defenceOrbitRadius + ship.getShieldRadiusEvenIfNoShield();
                 movementTargetLocation = MathUtils.getPointOnCircumference(ship.getLocation(), radius, angle);
                 break;
-            case ECCM_ARRAY:
-                angle = fieldOrbitAngle + ship.getFacing();
-                radius = fieldOrbitRadius + ship.getShieldRadiusEvenIfNoShield();
+            case SHIELD:
+                angle = shieldOrbitAngle + ship.getFacing();
+                radius = shieldOrbitRadius + ship.getShieldRadiusEvenIfNoShield();
                 movementTargetLocation = MathUtils.getPointOnCircumference(ship.getLocation(), radius, angle);
                 break;
             case RECALL:
@@ -113,7 +143,7 @@ public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
                     landingSlot = baseDroneSystem.getPlugin().getLandingBayWeaponSlotAPI();
                 }
 
-                movementTargetLocation = landingSlot.computePosition(ship);
+                movementTargetLocation = (landingSlot == null) ? ship.getLocation() : landingSlot.computePosition(ship);
                 break;
             default:
                 movementTargetLocation = ship.getMouseTarget();
@@ -130,8 +160,8 @@ public class dl_DroneRiftDroneAI extends dl_BaseDroneAI {
             case DEFENCE:
                 targetFacing = ship.getFacing() + defenceFacing;
                 break;
-            case ECCM_ARRAY:
-                targetFacing = ship.getFacing() + fieldOrbitAngle;
+            case SHIELD:
+                targetFacing = ship.getFacing() + shieldOrbitAngle;
                 break;
             case RECALL:
             default:

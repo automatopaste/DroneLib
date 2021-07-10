@@ -1,0 +1,5 @@
+name,id,hotkey,inTime,activeTime,outTime,cooldownTime,isToggle,fluxPerSecondPercentMaxCapacity,fluxPerSecondFlat
+Burner Drive,bdrive,B,1,5,0.5,3,TRUE,4,0
+Axed Ammo Feeder,accammo,N,3,3,3,3,,0.5,0
+Phaze Cloak,pcloak,M,0.5,,0.5,2,TRUE,0,0
+Five Drones,fivedrones,H,0.3,,0.3,,,,

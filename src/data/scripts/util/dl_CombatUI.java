@@ -1,10 +1,9 @@
 package data.scripts.util;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipVariantAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
+import data.scripts.plugins.dl_SubsystemCombatManager;
 import org.lazywizard.lazylib.ui.FontException;
 import org.lazywizard.lazylib.ui.LazyFont;
 import org.lazywizard.lazylib.ui.LazyFont.DrawableString;
@@ -19,12 +18,12 @@ import java.util.Set;
 
 /**
  *
- * @author Dark.Revenant, Tartiflette, LazyWizard, Snrasha
- * and tomatopaste because jesus christ why are these all private methods in magiclib
+ * @author Dark.Revenant, Tartiflette, LazyWizard, Snrasha, Tomatopaste
+ * because jesus christ why are most of these private methods in magiclib
  *
  */
 
-public class dl_CombatBarUI {
+public class dl_CombatUI {
     //Color of the HUD when the ship is alive or the hud
     public static final Color GREENCOLOR;
     //Color of the HUD when the ship is not alive.
@@ -47,12 +46,449 @@ public class dl_CombatBarUI {
             LazyFont fontdraw = LazyFont.loadFont("graphics/fonts/victor14.fnt");
             TODRAW14 = fontdraw.createText();
 
-            if (UIscaling > 1f) { //motherfucker
+            if (UIscaling > 1f) { //mf
                 TODRAW14.setFontSize(14f * UIscaling);
             }
 
         } catch (FontException ignored) {
         }
+    }
+
+    ///////////////////////////////////
+    //                               //
+    //         SUBSYSTEM GUI         //
+    //                               //
+    ///////////////////////////////////
+
+    /**
+     *
+     * @author tomatopaste
+     * @param ship Player ship
+     * @param fill Value 0 to 1, how full the bar is from left to right
+     * @param name Name of subsystem
+     * @param infoText Info string opportunity
+     * @param stateText Subsystem activity status
+     * @param hotkey Hotkey string of key used to activate subsystem
+     * @param flavourText A brief description of what the subsystem does
+     */
+    public static Vector2f drawSubsystemStatus(
+            ShipAPI ship,
+            float fill,
+            String name,
+            String infoText,
+            String stateText,
+            String hotkey,
+            String flavourText,
+            boolean showInfoText,
+            int guiBarCount,
+            Vector2f inputLoc,
+            Vector2f rootLoc
+    ) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (!ship.equals(engine.getPlayerShip()) || engine.isUIShowingDialog()) return null;
+        if (engine.getCombatUI() == null || engine.getCombatUI().isShowingCommandUI() || !engine.isUIShowingHUD()) return null;
+
+        Color color = (ship.isAlive()) ? GREENCOLOR : BLUCOLOR;
+
+        final float barHeight = 13f * UIscaling;
+        final int bars = (showInfoText) ? guiBarCount + 1 : guiBarCount;
+
+        Vector2f loc = new Vector2f(inputLoc);
+
+        openGL11ForText();
+
+        TODRAW14.setMaxWidth(6969);
+
+        TODRAW14.setText(name);
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(loc.x + 1, loc.y - 1);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(loc);
+
+        Vector2f hotkeyTextLoc = new Vector2f(loc);
+        hotkeyTextLoc.y -= barHeight * UIscaling;
+        hotkeyTextLoc.x += 20f * UIscaling;
+
+        TODRAW14.setText("HOTKEY: " + hotkey);
+        float hotkeyTextWidth = TODRAW14.getWidth();
+        if (showInfoText) {
+            TODRAW14.setColor(Color.BLACK);
+            TODRAW14.draw(hotkeyTextLoc.x + 1, hotkeyTextLoc.y - 1);
+            TODRAW14.setColor(color);
+            TODRAW14.draw(hotkeyTextLoc);
+        }
+
+        Vector2f flavourTextLoc = new Vector2f(hotkeyTextLoc);
+        flavourTextLoc.x += hotkeyTextWidth + 20f * UIscaling;
+
+        TODRAW14.setText("BRIEF: " + flavourText);
+        if (showInfoText) {
+            TODRAW14.setColor(Color.BLACK);
+            TODRAW14.draw(flavourTextLoc.x + 1, flavourTextLoc.y - 1);
+            TODRAW14.setColor(color);
+            TODRAW14.draw(flavourTextLoc);
+        }
+
+        Vector2f boxLoc = new Vector2f(loc);
+        boxLoc.x += 200f * UIscaling;
+
+        final float boxHeight = 9f * UIscaling;
+        final float boxEndWidth = 45f * UIscaling;
+
+        float boxWidth = boxEndWidth * fill;
+
+        Vector2f stateLoc = new Vector2f(boxLoc);
+        TODRAW14.setText(stateText);
+        stateLoc.x -= TODRAW14.getWidth() + (4f * UIscaling);
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(stateLoc.x + 1, stateLoc.y - 1);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(stateLoc);
+
+        Vector2f infoLoc = new Vector2f(boxLoc);
+        infoLoc.x += boxEndWidth + (5f * UIscaling);
+        TODRAW14.setText(infoText);
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(infoLoc.x + 1, infoLoc.y - 1);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(infoLoc);
+
+        closeGL11ForText();
+
+        final int width = (int) (Display.getWidth() * Display.getPixelScaleFactor());
+        final int height = (int) (Display.getHeight() * Display.getPixelScaleFactor());
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glViewport(0, 0, width, height);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, width, 0, height, -1, 1);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glTranslatef(0.01f, 0.01f, 0);
+
+        Vector2f nodeLoc = new Vector2f(loc);
+        nodeLoc.y -= 4f * UIscaling;
+        nodeLoc.x -= 2f * UIscaling;
+
+        Vector2f titleLoc = getSubsystemTitleLoc(ship);
+        boolean isHigh = loc.y > titleLoc.y;
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINE_STRIP);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        nodeLoc.y += (isHigh) ? -6f * UIscaling : 6f * UIscaling;
+        nodeLoc.x -= 6f * UIscaling;
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        boolean isTitleHigh = rootLoc.y > titleLoc.y - 16f;
+        nodeLoc.y = getSubsystemTitleLoc(ship).y;
+        nodeLoc.y -= 16f;
+        nodeLoc.y -= (isTitleHigh) ? -6f * UIscaling : 6f * UIscaling;
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        GL11.glEnd();
+
+        Vector2f boxRenderLoc = new Vector2f(boxLoc);
+        boxRenderLoc.y -= 3f * UIscaling;
+
+        //drop shadow
+        Vector2f shadowLoc = new Vector2f(boxRenderLoc);
+        shadowLoc.x += UIscaling;
+        shadowLoc.y -= UIscaling;
+        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GL11.glColor4f(0f, 0f, 0f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(shadowLoc.x, shadowLoc.y);
+        GL11.glVertex2f(shadowLoc.x + boxWidth, shadowLoc.y);
+        GL11.glVertex2f(shadowLoc.x, shadowLoc.y - boxHeight);
+        GL11.glVertex2f(shadowLoc.x + boxWidth, shadowLoc.y - boxHeight);
+        GL11.glEnd();
+
+        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxRenderLoc.x, boxRenderLoc.y);
+        GL11.glVertex2f(boxRenderLoc.x + boxWidth, boxRenderLoc.y);
+        GL11.glVertex2f(boxRenderLoc.x, boxRenderLoc.y - boxHeight);
+        GL11.glVertex2f(boxRenderLoc.x + boxWidth, boxRenderLoc.y - boxHeight);
+        GL11.glEnd();
+
+        Vector2f boxEndBarLoc = new Vector2f(boxRenderLoc);
+        boxEndBarLoc.x += boxEndWidth;
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glColor4f(0f, 0f, 0f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxEndBarLoc.x + 1, boxEndBarLoc.y - 1);
+        GL11.glVertex2f(boxEndBarLoc.x + 1, boxEndBarLoc.y - boxHeight - 1);
+        GL11.glEnd();
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxEndBarLoc.x, boxEndBarLoc.y);
+        GL11.glVertex2f(boxEndBarLoc.x, boxEndBarLoc.y - boxHeight);
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glPopAttrib();
+
+        loc.y -= bars * barHeight;
+        return loc;
+    }
+
+    public static void renderAuxiliaryStatusBar(ShipAPI ship, float indent, float fillStartX, float fillLength, float fillLevel, String text1, String text2, Vector2f inputLoc) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        Color color = (ship.isAlive()) ? GREENCOLOR : BLUCOLOR;
+
+        inputLoc.x += indent * UIscaling;
+
+        Vector2f boxLoc = new Vector2f(inputLoc);
+        boxLoc.x += fillStartX * UIscaling;
+
+        final float boxHeight = 9f * UIscaling;
+        final float boxEndWidth = fillLength * UIscaling;
+
+        float boxWidth = boxEndWidth * fillLevel;
+
+        openGL11ForText();
+
+        TODRAW14.setMaxWidth(6969);
+
+        TODRAW14.setText(text1);
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(inputLoc.x + 1, inputLoc.y - 1);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(inputLoc);
+
+        Vector2f text2Pos = new Vector2f(boxLoc);
+        text2Pos.x += boxEndWidth + (4f * UIscaling);
+        TODRAW14.setText(text2);
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(text2Pos.x + 1, text2Pos.y - 1);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(text2Pos);
+
+        closeGL11ForText();
+
+        final int width = (int) (Display.getWidth() * Display.getPixelScaleFactor());
+        final int height = (int) (Display.getHeight() * Display.getPixelScaleFactor());
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glViewport(0, 0, width, height);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, width, 0, height, -1, 1);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glTranslatef(0.01f, 0.01f, 0);
+
+        Vector2f nodeLoc = new Vector2f(inputLoc);
+        nodeLoc.x -= 2f * UIscaling;
+        nodeLoc.y -= 4f * UIscaling;
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINE_STRIP);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        nodeLoc.x -= 4f * UIscaling;
+        nodeLoc.y += 4f * UIscaling;
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        nodeLoc.x -= (indent - 14f) * UIscaling; //7
+        GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
+
+        GL11.glEnd();
+
+        Vector2f boxRenderLoc = new Vector2f(boxLoc);
+        boxRenderLoc.y -= 3f * UIscaling;
+
+        //drop shadow
+        Vector2f shadowLoc = new Vector2f(boxRenderLoc);
+        shadowLoc.x += UIscaling;
+        shadowLoc.y -= UIscaling;
+        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GL11.glColor4f(0f, 0f, 0f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(shadowLoc.x, shadowLoc.y);
+        GL11.glVertex2f(shadowLoc.x + boxWidth, shadowLoc.y);
+        GL11.glVertex2f(shadowLoc.x, shadowLoc.y - boxHeight);
+        GL11.glVertex2f(shadowLoc.x + boxWidth, shadowLoc.y - boxHeight);
+        GL11.glEnd();
+
+        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxRenderLoc.x, boxRenderLoc.y);
+        GL11.glVertex2f(boxRenderLoc.x + boxWidth, boxRenderLoc.y);
+        GL11.glVertex2f(boxRenderLoc.x, boxRenderLoc.y - boxHeight);
+        GL11.glVertex2f(boxRenderLoc.x + boxWidth, boxRenderLoc.y - boxHeight);
+        GL11.glEnd();
+
+        Vector2f boxEndBarLoc = new Vector2f(boxRenderLoc);
+        boxEndBarLoc.x += boxEndWidth;
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glColor4f(0f, 0f, 0f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxEndBarLoc.x + 1, boxEndBarLoc.y - 1);
+        GL11.glVertex2f(boxEndBarLoc.x + 1, boxEndBarLoc.y - boxHeight - 1);
+        GL11.glEnd();
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+        GL11.glVertex2f(boxEndBarLoc.x, boxEndBarLoc.y);
+        GL11.glVertex2f(boxEndBarLoc.x, boxEndBarLoc.y - boxHeight);
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glPopAttrib();
+    }
+
+    public static Vector2f getSubsystemsRootLocation(ShipAPI ship, int numBars, float barHeight) {
+        Vector2f loc = new Vector2f(529f, 74f);
+        Vector2f.add(loc, getUIElementOffset(ship, ship.getVariant()), loc);
+
+        float height = numBars * barHeight * UIscaling;
+
+        int numWeapons = getNumWeapons(ship);
+        float maxWeaponHeight = numWeapons * (13f * UIscaling) + 30f;
+        if (numWeapons == 0) maxWeaponHeight -= 5f * UIscaling;
+
+        final float minOffset = 10f * UIscaling;
+        float weaponOffset = maxWeaponHeight + minOffset;
+
+        loc.y = weaponOffset + height;
+
+        loc.x *= UIscaling;
+
+        return loc;
+    }
+
+    private static int getNumWeapons(ShipAPI ship) {
+        WeaponGroupAPI groups = ship.getSelectedGroupAPI();
+        List<WeaponAPI> weapons = (groups == null) ? null : groups.getWeaponsCopy();
+        return (weapons == null) ? 0 : weapons.size();
+    }
+
+    private static Vector2f getSubsystemTitleLoc(ShipAPI ship) {
+        Vector2f loc = new Vector2f(529f, 72f);
+        Vector2f.add(loc, getUIElementOffset(ship, ship.getVariant()), loc);
+        loc.scale(UIscaling);
+
+        return loc;
+    }
+
+    public static void drawSubsystemsTitle(ShipAPI ship, boolean showInfo, Vector2f rootLoc) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (!ship.equals(engine.getPlayerShip()) || engine.isUIShowingDialog()) return;
+        if (engine.getCombatUI() == null || engine.getCombatUI().isShowingCommandUI() || !engine.isUIShowingHUD()) return;
+
+        Color color = (ship.isAlive()) ? GREENCOLOR : BLUCOLOR;
+
+        float barHeight = 13f * UIscaling;
+        Vector2f loc = getSubsystemTitleLoc(ship);
+
+        openGL11ForText();
+
+        String info = "TOGGLE INFO WITH \"" + dl_SubsystemCombatManager.INFO_TOGGLE_KEY + "\"";
+
+        Vector2f titleTextLoc = new Vector2f(loc);
+        Vector2f infoTextLoc = new Vector2f(rootLoc);
+
+        TODRAW14.setText("SUBSYSTEMS");
+        titleTextLoc.x -= TODRAW14.getWidth() + (14f * UIscaling);
+
+        TODRAW14.setColor(Color.BLACK);
+        TODRAW14.draw(titleTextLoc.x + 1f, titleTextLoc.y - 1f);
+        TODRAW14.setColor(color);
+        TODRAW14.draw(titleTextLoc);
+
+        if (showInfo) {
+            infoTextLoc.y += barHeight * UIscaling;
+            infoTextLoc.x -= 4f * UIscaling;
+
+            TODRAW14.setText(info);
+            TODRAW14.setColor(Color.BLACK);
+            TODRAW14.draw(infoTextLoc.x + 1f, infoTextLoc.y - 1f);
+            TODRAW14.setColor(color);
+            TODRAW14.draw(infoTextLoc);
+        }
+
+        closeGL11ForText();
+
+        final int width = (int) (Display.getWidth() * Display.getPixelScaleFactor());
+        final int height = (int) (Display.getHeight() * Display.getPixelScaleFactor());
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glViewport(0, 0, width, height);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, width, 0, height, -1, 1);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glTranslatef(0.01f, 0.01f, 0);
+
+        GL11.glLineWidth(UIscaling);
+        GL11.glBegin(GL11.GL_LINE_STRIP);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
+
+        Vector2f sysBarNode = new Vector2f(loc);
+
+        final float length = 354f * UIscaling; //354
+        sysBarNode.x -= length;
+        sysBarNode.y += 4f * UIscaling;
+        GL11.glVertex2f(sysBarNode.x, sysBarNode.y);
+
+        //sysBarNode.x += length - (16f * UIscaling);
+        sysBarNode.x += length - (113f * UIscaling);
+        GL11.glVertex2f(sysBarNode.x, sysBarNode.y);
+
+        sysBarNode.x += 20f * UIscaling;
+        sysBarNode.y -= 20f * UIscaling;
+        GL11.glVertex2f(sysBarNode.x, sysBarNode.y);
+
+        sysBarNode.x += (85f - 6f * UIscaling);
+        GL11.glVertex2f(sysBarNode.x, sysBarNode.y);
+
+        boolean isTitleHigh = rootLoc.y > loc.y - 16f;
+        sysBarNode.y += (isTitleHigh) ? 6f * UIscaling : -6f * UIscaling;
+        sysBarNode.x += 6f * UIscaling;
+        GL11.glVertex2f(sysBarNode.x, sysBarNode.y);
+
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glPopAttrib();
     }
 
     ///////////////////////////////////
@@ -93,7 +529,6 @@ public class dl_CombatBarUI {
             addInterfaceStatusText(ship, text);
             addInterfaceStatusNumber(ship, rearText);
         }
-
     }
 
     ///// UTILS /////
@@ -144,12 +579,12 @@ public class dl_CombatBarUI {
         }
         if (variant.getFittedWings().isEmpty()) {
             if (numEntries < 2) {
-                return dl_CombatBarUI.PERCENTBARVEC1;
+                return dl_CombatUI.PERCENTBARVEC1;
             }
             return new Vector2f(30f + ((numEntries - 2) * 13f), 18f + ((numEntries - 2) * 26f));
         } else {
             if (numEntries < 2) {
-                return dl_CombatBarUI.PERCENTBARVEC2;
+                return dl_CombatUI.PERCENTBARVEC2;
             }
             return new Vector2f(59f + ((numEntries - 2) * 13f), 76f + ((numEntries - 2) * 26f));
         }

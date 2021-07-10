@@ -1,2 +1,2 @@
 name,id,designation,tech/manufacturer,system id,fleet pts,hitpoints,armor rating,max flux,8/6/5/4%,flux dissipation,ordnance points,fighter bays,max speed,acceleration,deceleration,max turn rate,turn acceleration,mass,shield type,defense id,shield arc,shield upkeep,shield efficiency,phase cost,phase upkeep,min crew,max crew,cargo,fuel,fuel/ly,range,max burn,base value,cr %/day,CR to deploy,peak CR sec,CR loss/sec,supplies/rec,supplies/mo,hints,tags,rarity,breakProb,minPieces,maxPieces,number
-Rift,dl_rift_drone,Drone,yeah,,,350,75,600,,150,,,320,500,300,360,360,30,NONE,,,,,,,0,0,,,,,,,,,,,,,,,,0,,,696969
+Fiver Drone,fiver_drone,Drone,unknown,,,200,60,600,,150,,,350,500,300,360,360,30,FRONT,,60,0,0.5,,,0,0,,,,,,,,,,,,,,,,0,,,55555

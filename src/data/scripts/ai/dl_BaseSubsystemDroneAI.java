@@ -1,40 +1,41 @@
 package data.scripts.ai;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAIPlugin;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipwideAIFlags;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import data.scripts.impl.dl_DroneAPI;
-import data.scripts.shipsystems.dl_BaseDroneSystem;
+import data.scripts.subsystems.dl_BaseDroneSubsystem;
 import data.scripts.util.dl_DroneAIUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-public abstract class dl_BaseDroneAI implements ShipAIPlugin {
-    protected CombatEngineAPI engine;
+public abstract class dl_BaseSubsystemDroneAI implements ShipAIPlugin {
     protected dl_DroneAPI drone;
     protected ShipAPI ship;
     protected String uniqueSystemPrefix;
-    protected dl_BaseDroneSystem baseDroneSystem;
+    protected dl_BaseDroneSubsystem baseDroneSubsystem;
     protected int droneIndex;
 
     protected final IntervalUtil delayBeforeLandingTracker = new IntervalUtil(2f, 2f);
     protected WeaponSlotAPI landingSlot;
 
-    public dl_BaseDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSystem baseDroneSystem) {
+    public dl_BaseSubsystemDroneAI(dl_DroneAPI passedDrone, dl_BaseDroneSubsystem baseDroneSubsystem) {
         this.drone = passedDrone;
         this.ship = drone.getDroneSource();
 
-        this.baseDroneSystem = baseDroneSystem;
-        this.uniqueSystemPrefix = baseDroneSystem.getSystemID();
+        this.baseDroneSubsystem = baseDroneSubsystem;
+        this.uniqueSystemPrefix = baseDroneSubsystem.getSystemID();
 
         drone.getAIFlags().setFlag(ShipwideAIFlags.AIFlags.DRONE_MOTHERSHIP);
-
-        engine = Global.getCombatEngine();
     }
 
     @Override
     public void advance(float amount) {
+        CombatEngineAPI engine = Global.getCombatEngine();
         if (engine.isPaused() || drone == null) return;
 
         //check for relocation
@@ -49,15 +50,15 @@ public abstract class dl_BaseDroneAI implements ShipAIPlugin {
             }
         }
 
-        if (!baseDroneSystem.getDeployedDrones().contains(drone)) {
-            baseDroneSystem.getDeployedDrones().add(drone);
+        if (!baseDroneSubsystem.getDeployedDrones().contains(drone)) {
+            baseDroneSubsystem.getDeployedDrones().add(drone);
         }
 
         //check if currently superfluous
-        droneIndex = baseDroneSystem.getIndex(drone);
+        droneIndex = baseDroneSubsystem.getIndex(drone);
         if (droneIndex == -1) {
             if (landingSlot == null) {
-                landingSlot = baseDroneSystem.getPlugin().getLandingBayWeaponSlotAPI();
+                landingSlot = baseDroneSubsystem.getLandingBayWeaponSlotAPI();
             }
 
             Vector2f movementTargetLocation = landingSlot.computePosition(ship);
