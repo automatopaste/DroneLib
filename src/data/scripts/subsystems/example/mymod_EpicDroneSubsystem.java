@@ -1,6 +1,8 @@
 package data.scripts.subsystems.example;
 
 import data.scripts.ai.dl_BaseDroneAI;
+import data.scripts.ai.dl_BaseSubsystemDroneAI;
+import data.scripts.ai.example.mymod_EpicSubsystemDroneAI;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.shipsystems.example.dl_FiverDroneSystem;
 import data.scripts.subsystems.dl_BaseDroneSubsystem;
@@ -9,12 +11,12 @@ import data.scripts.util.dl_SpecLoadingUtils;
 public class mymod_EpicDroneSubsystem extends dl_BaseDroneSubsystem {
     public static final String SUBSYSTEM_ID = "fivedrones"; //this should match the id in the csv
 
-    public enum EpicSubsysDroneOrders {
+    public enum EpicDroneOrders {
         DEFENCE,
         SHIELD,
         RECALL
     }
-    private EpicSubsysDroneOrders droneOrders = EpicSubsysDroneOrders.RECALL;
+    private EpicDroneOrders droneOrders = EpicDroneOrders.RECALL;
 
     public mymod_EpicDroneSubsystem() {
         super(dl_SpecLoadingUtils.droneSystemSpecHashMap.get("dl_fivedrones"), dl_SpecLoadingUtils.getSubsystemData(SUBSYSTEM_ID));
@@ -25,11 +27,11 @@ public class mymod_EpicDroneSubsystem extends dl_BaseDroneSubsystem {
         droneOrders = getNextDroneOrder();
     }
 
-    private EpicSubsysDroneOrders getNextDroneOrder() {
+    private EpicDroneOrders getNextDroneOrder() {
         if (droneOrders.ordinal() == dl_FiverDroneSystem.FiverDroneOrders.values().length - 1) {
-            return EpicSubsysDroneOrders.values()[0];
+            return EpicDroneOrders.values()[0];
         }
-        return EpicSubsysDroneOrders.values()[droneOrders.ordinal() + 1];
+        return EpicDroneOrders.values()[droneOrders.ordinal() + 1];
     }
 
     @Override
@@ -53,12 +55,12 @@ public class mymod_EpicDroneSubsystem extends dl_BaseDroneSubsystem {
 
     @Override
     public boolean isRecallMode() {
-        return droneOrders == EpicSubsysDroneOrders.RECALL;
+        return droneOrders == EpicDroneOrders.RECALL;
     }
 
     @Override
     public void setDefaultDeployMode() {
-        droneOrders = EpicSubsysDroneOrders.DEFENCE;
+        droneOrders = EpicDroneOrders.DEFENCE;
     }
 
     @Override
@@ -76,9 +78,13 @@ public class mymod_EpicDroneSubsystem extends dl_BaseDroneSubsystem {
         }
     }
 
+    public EpicDroneOrders getDroneOrders() {
+        return droneOrders;
+    }
+
     @Override
-    public dl_BaseDroneAI getNewDroneAIInstance(dl_DroneAPI spawnedDrone) {
-        return null;
+    public dl_BaseSubsystemDroneAI getNewDroneAIInstance(dl_DroneAPI spawnedDrone) {
+        return new mymod_EpicSubsystemDroneAI(spawnedDrone, this);
     }
 
     @Override

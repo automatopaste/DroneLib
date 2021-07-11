@@ -77,13 +77,6 @@ public abstract class dl_BaseSubsystemDroneAI implements ShipAIPlugin {
 
     protected abstract void doRotationTargeting();
 
-    protected String getUniqueSystemID() {
-        if (uniqueSystemPrefix == null || ship == null) {
-            return "troled";
-        }
-        return uniqueSystemPrefix + ship.hashCode();
-    }
-
     @Override
     public ShipwideAIFlags getAIFlags() {
         ShipwideAIFlags flags = new ShipwideAIFlags();

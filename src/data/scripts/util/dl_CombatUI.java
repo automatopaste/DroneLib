@@ -301,18 +301,18 @@ public class dl_CombatUI {
 
         Vector2f nodeLoc = new Vector2f(inputLoc);
         nodeLoc.x -= 2f * UIscaling;
-        nodeLoc.y -= 4f * UIscaling;
+        nodeLoc.y -= 11f * UIscaling;
 
         GL11.glLineWidth(UIscaling);
         GL11.glBegin(GL11.GL_LINE_STRIP);
         GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f - engine.getCombatUI().getCommandUIOpacity());
         GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
 
-        nodeLoc.x -= 4f * UIscaling;
-        nodeLoc.y += 4f * UIscaling;
+        nodeLoc.x -= 6f * UIscaling;
+        nodeLoc.y += 6f * UIscaling;
         GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
 
-        nodeLoc.x -= (indent - 14f) * UIscaling; //7
+        nodeLoc.y += 4f * UIscaling; //7
         GL11.glVertex2f(nodeLoc.x, nodeLoc.y);
 
         GL11.glEnd();

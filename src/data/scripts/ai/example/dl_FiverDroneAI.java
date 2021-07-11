@@ -143,7 +143,7 @@ public class dl_FiverDroneAI extends dl_BaseDroneAI {
                     landingSlot = baseDroneSystem.getPlugin().getLandingBayWeaponSlotAPI();
                 }
 
-                movementTargetLocation = (landingSlot == null) ? ship.getLocation() : landingSlot.computePosition(ship);
+                movementTargetLocation = (landingSlot == null) ? new Vector2f(ship.getLocation()) : landingSlot.computePosition(ship);
                 break;
             default:
                 movementTargetLocation = ship.getMouseTarget();

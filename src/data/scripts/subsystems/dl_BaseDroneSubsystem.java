@@ -3,11 +3,10 @@ package data.scripts.subsystems;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
 import com.fs.starfarer.api.mission.FleetSide;
 import com.fs.starfarer.api.util.IntervalUtil;
-import data.scripts.ai.dl_BaseDroneAI;
+import data.scripts.ai.dl_BaseSubsystemDroneAI;
 import data.scripts.impl.dl_DroneAPI;
 import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.util.dl_CombatUI;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
-    protected ShipAPI ship;
     protected final dl_SpecLoadingUtils.DroneSystemSpec droneSubsystemData;
 
     protected IntervalUtil launchTracker;
@@ -30,6 +28,9 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         super(subsystemData);
         this.droneSubsystemData = droneSubsystemData;
         launchTracker = new IntervalUtil((float) droneSubsystemData.launchDelay, (float) droneSubsystemData.launchDelay);
+
+        reserveDroneCount = droneSubsystemData.maxDeployedDrones;
+        forgeCooldownRemaining = (float) droneSubsystemData.forgeCooldown;
     }
 
     //////////
@@ -41,7 +42,6 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
     protected static final String STATUS_DISPLAY_KEY = "dl_DroneStatKey";
     protected static final String STATUS_DISPLAY_SPRITE = "graphics/icons/hullsys/drone_pd_high.png";
     protected static final String STATUS_DISPLAY_TITLE = "SYSTEM STATE";
-    protected String systemID;
 
     protected ArrayList<dl_DroneAPI> deployedDrones = new ArrayList<>();
 
@@ -55,18 +55,11 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
 
     public abstract void executePerOrders(float amount);
 
-    public abstract dl_BaseDroneAI getNewDroneAIInstance(dl_DroneAPI spawnedDrone);
+    public abstract dl_BaseSubsystemDroneAI getNewDroneAIInstance(dl_DroneAPI spawnedDrone);
 
     @Override
     public void unapply(MutableShipStatsAPI stats, String id) {
-        //initialisation and engine data stuff
-        this.ship = (ShipAPI) stats.getEntity();
-        CombatEngineAPI engine = Global.getCombatEngine();
 
-        if (engine != null) {
-            String UNIQUE_SYSTEM_ID = systemID + ship.hashCode();
-            engine.getCustomData().put(UNIQUE_SYSTEM_ID, this);
-        }
     }
 
     @Override
@@ -102,6 +95,8 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
 
     @Override
     public Vector2f guiRender(Vector2f inputLoc, Vector2f rootLoc) {
+        if (ship == null || !Global.getCombatEngine().isUIShowingHUD() || Global.getCombatEngine().isUIShowingDialog()) return new Vector2f();
+
         Vector2f out = super.guiRender(inputLoc, rootLoc);
         Vector2f in = new Vector2f(out);
         in.y += 13f * Global.getSettings().getScreenScaleMult();
@@ -112,7 +107,7 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
                 30f,
                 forgeCooldownRemaining / forgeCooldown,
                 "DRONE FORGE",
-                getInfoString(),
+                reserveDroneCount + "/" + droneSubsystemData.maxReserveDroneCount,
                 in
         );
         return out;
@@ -139,28 +134,20 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
     public void advance(float amount) {
         super.advance(amount);
 
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        if (engine != null && ship != null) {
+            engine.getCustomData().put(getSystemID() + ship.hashCode(), this);
+        }
+
         launchManagerAdvance(amount);
     }
 
     public void launchManagerAdvance(float amount) {
-        if (ship == null || !ship.isAlive()) {
-            return;
-        }
-
-        dl_CombatUI.drawSecondUnlimitedInterfaceStatusBar(
-                ship,
-                forgeCooldownRemaining/ forgeCooldown,
-                null,
-                null,
-                (float) reserveDroneCount / droneSubsystemData.maxReserveDroneCount,
-                "FORGE",
-                reserveDroneCount + "/" + droneSubsystemData.maxReserveDroneCount
-        );
+        if (ship == null || !ship.isAlive()) return;
 
         CombatEngineAPI engine = Global.getCombatEngine();
-        if (engine.isPaused()) {
-            return;
-        }
+        if (engine.isPaused()) return;
 
         //stat modifications
         float regenDelayStatMod = ship.getMutableStats().getDynamic().getMod(REGEN_DELAY_STAT_KEY).computeEffective(1f);
@@ -212,8 +199,6 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         }
 
         setDeployedDrones(deployedDrones);
-
-        //system.setAmmo(deployedDrones.size());
 
         engine.getCustomData().put("dl_DroneList_" + ship.hashCode(), deployedDrones);
 
