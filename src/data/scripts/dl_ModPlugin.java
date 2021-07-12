@@ -1,6 +1,7 @@
 package data.scripts;
 
 import com.fs.starfarer.api.BaseModPlugin;
+import com.fs.starfarer.api.Global;
 import data.scripts.subsystems.example.*;
 import data.scripts.util.dl_SpecLoadingUtils;
 import data.scripts.util.dl_SubsystemUtils;
@@ -29,8 +30,10 @@ public class dl_ModPlugin extends BaseModPlugin {
      * Example method of baking subsystems into ship hulls.
      */
     private void applySubsystems() {
-        dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicAcceleratedAmmoFeederSubsystem.class);
-        //dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicDroneSubsystem.class);
+        if (Global.getSettings().getBoolean("dl_UseHammerheadForShowcase")) {
+            dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicAcceleratedAmmoFeederSubsystem.class);
+            dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicDroneSubsystem.class);
+        }
     }
 
     /**
