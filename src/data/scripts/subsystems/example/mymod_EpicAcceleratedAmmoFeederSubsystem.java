@@ -36,7 +36,8 @@ public class mymod_EpicAcceleratedAmmoFeederSubsystem extends dl_BaseSubsystem {
 
     @Override
     public String getInfoString() {
-        return "BRRRRRRRT";
+        if (isOn()) return "BRRRRRTING";
+        else return "PREPARING DAKKA";
     }
 
     @Override

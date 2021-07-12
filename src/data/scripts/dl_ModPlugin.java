@@ -30,7 +30,7 @@ public class dl_ModPlugin extends BaseModPlugin {
      */
     private void applySubsystems() {
         dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicAcceleratedAmmoFeederSubsystem.class);
-        dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicDroneSubsystem.class);
+        //dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicDroneSubsystem.class);
     }
 
     /**
