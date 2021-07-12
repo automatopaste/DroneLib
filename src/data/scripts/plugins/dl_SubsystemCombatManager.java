@@ -15,7 +15,7 @@ import java.util.*;
 
 public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
     public static final String DATA_KEY = "dl_SubsystemCombatManager";
-    public static final String INFO_TOGGLE_KEY = "Z";
+    public static final String INFO_TOGGLE_KEY = Global.getSettings().getString("dl_SubsystemToggleKey");
 
     public static boolean showInfoText = true;
 

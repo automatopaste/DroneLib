@@ -1,5 +1,7 @@
 {
   "plugins":{
     "dl_SubsystemCombatManager":"data.scripts.plugins.dl_SubsystemCombatManager",
-  }
+  },
+
+  "dl_SubsystemToggleKey": "Z",
 }

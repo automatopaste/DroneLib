@@ -61,7 +61,6 @@ public class dl_SubsystemUtils {
      * type is already associated first.
      * @param hullId Hull ID to associate with
      * @param subsystem Class of subsystem to associate
-     * @param checkForClass Whether to check if the class is already associated
      */
     public static void addSubsystemToShipHull(String hullId, Class<? extends dl_BaseSubsystem> subsystem) {
         List<Class<? extends dl_BaseSubsystem>> subsystems = dl_SubsystemCombatManager.getSubsystemsByHullId().get(hullId);

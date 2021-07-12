@@ -19,16 +19,24 @@ public class dl_ModPlugin extends BaseModPlugin {
             e.printStackTrace();
         }
 
-        //dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicAcceleratedAmmoFeederSubsystem.class);
-        dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicBurnDriveSubsystem.class);
-        //dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicPhaseCloakSubsystem.class);
+        //vvv!! EXAMPLE !!vvv
+        applySubsystems();
+        loadDroneSystemSpecJson();
+        //^^^!! EXAMPLE !!^^^
+    }
+
+    /**
+     * Example method of baking subsystems into ship hulls.
+     */
+    private void applySubsystems() {
+        dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicAcceleratedAmmoFeederSubsystem.class);
         dl_SubsystemUtils.addSubsystemToShipHull("hammerhead", mymod_EpicDroneSubsystem.class);
+    }
 
-        dl_SubsystemUtils.addSubsystemToShipHull("onslaught", mymod_EpicBurnDriveSubsystem.class);
-        dl_SubsystemUtils.addSubsystemToShipHull("onslaught", mymod_EpicPhaseCloakSubsystem.class);
-
-        dl_SubsystemUtils.addSubsystemToShipHull("hound", mymod_EpicPhaseCloakSubsystem.class);
-
+    /**
+     * Example method of loading
+     */
+    private void loadDroneSystemSpecJson() {
         //try/catch block for each system with a loadJSON method
         try {
             dl_SpecLoadingUtils.dl_FiveDronesSpecLoading.loadJSON();

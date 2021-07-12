@@ -1,7 +1,7 @@
 package data.scripts.subsystems;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.plugins.dl_SubsystemCombatManager;
 import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.util.dl_CombatUI;
@@ -66,19 +66,26 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     private float effectLevel = 0f;
     private float guiLevel = 0f;
 
+    /**
+     * Checks if activation is legal then will start subsystem cycle
+     */
+    protected void activate() {
+        if (isOff() && !isCooldown()) {
+            state = SubsystemState.IN;
+        }
+        if (isToggle() && isActive()) {
+            state = SubsystemState.OUT;
+            active = 0f;
+        }
+    }
+
     @Override
     public void advance(float amount) {
         if (ship == null || !ship.isAlive()) return;
 
         boolean isHotkeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getHotkeyString()));
         if (isHotkeyDown && !isHotkeyDownLastUpdate) {
-            if (isOff() && !isCooldown()) {
-                state = SubsystemState.IN;
-            }
-            if (isToggle() && isActive()) {
-                state = SubsystemState.OUT;
-                active = 0f;
-            }
+            activate();
         }
 
         switch (state) {
@@ -158,8 +165,8 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
             unapply(ship.getMutableStats(), sysId);
         }
 
-        CombatEngineAPI engine = Global.getCombatEngine();
-        if (engine.getPlayerShip().equals(ship)) engine.maintainStatusForPlayerShip(sysId, null, getName(), state.name(), false);
+        //CombatEngineAPI engine = Global.getCombatEngine();
+        //if (engine.getPlayerShip().equals(ship)) engine.maintainStatusForPlayerShip(sysId, null, getName(), state.name(), false);
 
         aiUpdate(amount);
 
