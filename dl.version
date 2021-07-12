@@ -1,11 +1,11 @@
 {
 	"masterVersionFile":"https://github.com/automatopaste/DroneLib/releases/download/v1/dl.version",
 	"modName":"DroneLib",
-	#"modThreadId":69,
+	"modThreadId":22274,
 	"modVersion":
 	{
-		"major":0,
-		"minor":1,
-		"patch":2
+		"major":1,
+		"minor":0,
+		"patch":0
 	},
 }

@@ -1,10 +1,17 @@
 {
-	"id":"DroneLib",
+	"id":"dronelib",
 	"name":"DroneLib",
 	"author":"tomatopaste",
-	"version":"0.1.2",
+	"version":"1.0.0",
 	"description":"A collection of drone related utilities for AI and shipsystems. An example system structure has been included.",
 	"gameVersion":"0.95a-RC15",
 	"jars":["jars/DroneLib.jar"],
 	"modPlugin":"data.scripts.dl_ModPlugin",
+	"dependencies": [
+		{
+			"id": "lw_lazylib",
+			"name": "LazyLib",
+			#"version": "2.6"
+		},
+	]
 }
