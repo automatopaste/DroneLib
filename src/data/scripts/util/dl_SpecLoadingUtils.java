@@ -29,7 +29,7 @@ public final class dl_SpecLoadingUtils {
     public static void loadDroneSystemSpecs() throws IOException, JSONException {
         SettingsAPI settings = Global.getSettings();
 
-        JSONArray droneSystems = settings.getMergedSpreadsheetDataForMod("id","data/shipsystems/drone_systems.csv", "DroneLib");
+        JSONArray droneSystems = settings.getMergedSpreadsheetDataForMod("id","data/shipsystems/drone_systems.csv", "dronelib   ");
 
         int z = droneSystems.length();
         for (int i = 0; i < z; i++) {
@@ -56,7 +56,7 @@ public final class dl_SpecLoadingUtils {
 
     public static void loadSubsystemData() throws JSONException, IOException {
         SettingsAPI settings = Global.getSettings();
-        JSONArray subsystems = settings.loadCSV("data/subsystems/subsystems.csv");
+        JSONArray subsystems = settings.getMergedSpreadsheetDataForMod("id", "data/subsystems/subsystems.csv", "dronelib");
 
         for (int i = 0; i < subsystems.length(); i++) {
             JSONObject row = subsystems.getJSONObject(i);
