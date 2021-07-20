@@ -40,7 +40,7 @@ public class dl_SubsystemUtils {
 
     /**
      * Adds a subsystem to a specific ShipAPI instance. Checks if the subsystem instance (not type!) is already applied
-     * first.
+     * first. Subsystem must have .init(ShipAPI ship) .aiInit() called afterwards to prevent exceptions.
      * @param ship Ship to apply subsystem to
      * @param subsystem Subsystem instance to apply
      */

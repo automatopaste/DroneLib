@@ -2,7 +2,8 @@ package data.scripts;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
-import data.scripts.subsystems.example.*;
+import data.scripts.subsystems.example.mymod_EpicAcceleratedAmmoFeederSubsystem;
+import data.scripts.subsystems.example.mymod_EpicDroneSubsystem;
 import data.scripts.util.dl_SpecLoadingUtils;
 import data.scripts.util.dl_SubsystemUtils;
 import org.json.JSONException;
