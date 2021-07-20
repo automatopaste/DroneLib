@@ -1,4 +1,4 @@
-v1.1.2
+v1.1.0
 -added centralised subsystem hullmod queuing function to dl_SubsystemUtils
 -added useful methods to dl_BaseSubsystem
 
