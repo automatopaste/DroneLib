@@ -71,4 +71,21 @@ public interface dl_Subsystem {
      * @return number of bars used
      */
     int getNumGuiBars();
+
+    /**
+     * Whether the subsystem can be used while ship is venting.
+     * @return duh
+     */
+    boolean canUseWhileVenting();
+
+    /**
+     * Whether the subsystem can be used while ship is venting.
+     * @return duh
+     */
+    boolean canUseWhileOverloaded();
+
+    //todo
+    //String getStatusText(int index);
+
+    //String getStatusIconFilepath(int index);
 }

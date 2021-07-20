@@ -2,21 +2,40 @@ package data.scripts.util;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
 import data.scripts.plugins.dl_SubsystemCombatManager;
-import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.subsystems.dl_BaseSubsystem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class dl_SubsystemUtils {
+    private static final Map<ShipAPI, List<Class<? extends dl_BaseSubsystem>>> subsystemQueue = new HashMap<>();
     /**
      * Gets the subsystem manager instance from the combat engine.
      * @return The subsystem manager instance
      */
     public static dl_SubsystemCombatManager getSubsystemManager() {
         return (dl_SubsystemCombatManager) Global.getCombatEngine().getCustomData().get(dl_SubsystemCombatManager.DATA_KEY);
+    }
+
+    /**
+     * Queues a subsystem for a ShipAPI instance so it will be applied upon entering combat. Allows subsystems to be
+     * cleanly added via hullmod.
+     * @param ship Ship to add subsystem to
+     * @param subsystemClass Class of subsystem to add
+     */
+    public static void queueSubsystemFromHullmodForShip(ShipAPI ship, Class<? extends dl_BaseSubsystem> subsystemClass) {
+        if (ship == null || subsystemClass == null) throw new NullPointerException("ShipAPI or dl_BaseSubsystem was null");
+
+        List<Class<? extends dl_BaseSubsystem>> subsystems = subsystemQueue.get(ship);
+        if (subsystems == null) subsystems = new ArrayList<>();
+
+        if (!subsystems.contains(subsystemClass)) {
+            subsystems.add(subsystemClass);
+            subsystemQueue.put(ship, subsystems);
+        }
     }
 
     /**
@@ -87,5 +106,9 @@ public class dl_SubsystemUtils {
         subsystems.remove(subsystem);
 
         dl_SubsystemCombatManager.getSubsystemsByHullId().put(hullId, subsystems);
+    }
+
+    public static Map<ShipAPI, List<Class<? extends dl_BaseSubsystem>>> getSubsystemQueue() {
+        return subsystemQueue;
     }
 }

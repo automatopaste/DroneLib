@@ -8,6 +8,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.subsystems.dl_BaseSubsystem;
 import data.scripts.util.dl_CombatUI;
+import data.scripts.util.dl_SubsystemUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -16,6 +17,8 @@ import java.util.*;
 public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
     public static final String DATA_KEY = "dl_SubsystemCombatManager";
     public static final String INFO_TOGGLE_KEY = Global.getSettings().getString("dl_SubsystemToggleKey");
+
+    private Map<ShipAPI, List<Class<? extends dl_BaseSubsystem>>> subsystemHullmodQueue = new HashMap<>();
 
     public static boolean showInfoText = true;
 
@@ -33,6 +36,9 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
         showInfoText = true;
 
         subsystems.clear();
+
+        subsystemHullmodQueue = dl_SubsystemUtils.getSubsystemQueue();
+        dl_SubsystemUtils.getSubsystemQueue().clear();
     }
 
     private boolean isHotkeyDownLast = false;
@@ -45,27 +51,36 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
             for (ShipAPI ship : ships) {
                 if (!ship.isAlive()) continue;
 
-                List<Class<? extends dl_BaseSubsystem>> subsystemByHullId = subsystemsByHullId.get(ship.getHullSpec().getBaseHullId());
-                if (subsystemByHullId == null) continue;
-
                 List<dl_BaseSubsystem> subsystemsOnShip = subsystems.get(ship);
                 if (subsystemsOnShip == null) subsystemsOnShip = new ArrayList<>();
 
-                int index = 0;
-                outer:
-                for (Class<? extends dl_BaseSubsystem> c : subsystemByHullId) {
-                    for (dl_BaseSubsystem s : subsystemsOnShip) if (s.getClass().equals(c)) continue outer;
+                List<Class<? extends dl_BaseSubsystem>> toAdd = new ArrayList<>();
 
+                List<Class<? extends dl_BaseSubsystem>> subsystemByHullId = subsystemsByHullId.get(ship.getHullSpec().getBaseHullId());
+                if (subsystemByHullId != null) {
+                    outer:
+                    for (Class<? extends dl_BaseSubsystem> c : subsystemByHullId) {
+                        for (dl_BaseSubsystem s : subsystemsOnShip) if (s.getClass().equals(c)) continue outer;
+
+                        toAdd.add(c);
+                    }
+                }
+
+                List<Class<? extends dl_BaseSubsystem>> hullmodQueue = subsystemHullmodQueue.get(ship);
+                if (hullmodQueue != null) {
+                    toAdd.addAll(hullmodQueue);
+                    subsystemHullmodQueue.put(ship, null);
+                }
+
+                int index = 0;
+                for (Class<? extends dl_BaseSubsystem> t : toAdd) {
                     try {
-                        dl_BaseSubsystem subsystem = c.newInstance();
+                        dl_BaseSubsystem subsystem = t.newInstance();
 
                         subsystemsOnShip.add(subsystem);
                         subsystem.init(ship);
                         subsystem.setIndex(index);
                         index++;
-
-                        dl_BaseSubsystemAI ai = subsystem.getAI();
-                        ai.aiInit();
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }

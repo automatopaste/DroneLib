@@ -1,5 +1,6 @@
 package data.scripts.subsystems;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.plugins.dl_SubsystemCombatManager;
@@ -27,11 +28,13 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
     public dl_BaseSubsystem(String systemId) {
         this.data = dl_SpecLoadingUtils.getSubsystemData(systemId);
+        if (data == null) throw new NullPointerException("Subsystem data is null: " + systemId);
 
         state = SubsystemState.OFF;
     }
     public dl_BaseSubsystem(SubsystemData data) {
         this.data = data;
+        if (data == null) throw new NullPointerException("Subsystem data is null");
 
         state = SubsystemState.OFF;
     }
@@ -63,6 +66,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
     private boolean isHotkeyDownLastUpdate = false;
     private float active = 0f;
+    private float activeExtra = 0f;
     private float effectLevel = 0f;
     private float guiLevel = 0f;
 
@@ -70,6 +74,8 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
      * Checks if activation is legal then will start subsystem cycle
      */
     protected void activate() {
+        if (ship.getFluxTracker().isOverloaded() && !canUseWhileOverloaded()) return;
+        if (ship.getFluxTracker().isVenting() && !canUseWhileVenting()) return;
         if (isOff() && !isCooldown()) {
             state = SubsystemState.IN;
         }
@@ -84,13 +90,13 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         if (ship == null || !ship.isAlive()) return;
 
         boolean isHotkeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getHotkeyString()));
-        if (isHotkeyDown && !isHotkeyDownLastUpdate) {
+        if (isHotkeyDown && !isHotkeyDownLastUpdate && ship.equals(Global.getCombatEngine().getPlayerShip())) {
             activate();
         }
 
         switch (state) {
             case OFF:
-                if (isHotkeyDown && !isHotkeyDownLastUpdate) {
+                if (isHotkeyDown && !isHotkeyDownLastUpdate && ship.equals(Global.getCombatEngine().getPlayerShip())) {
                     state = SubsystemState.IN;
                 }
 
@@ -115,7 +121,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
                 }
                 break;
             case ACTIVE:
-                active  += amount;
+                active += amount;
 
                 if (isToggle()) {
                     guiLevel = 1f;
@@ -125,7 +131,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
                 effectLevel = 1f;
 
-                if (active >= getActiveTime()) {
+                if (active >= getActiveTime() + activeExtra) {
                     state = SubsystemState.OUT;
                     active = 0f;
                 }
@@ -252,6 +258,25 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     @Override
     public boolean isCooldown() {
         return state == SubsystemState.COOLDOWN;
+    }
+
+    @Override
+    public boolean canUseWhileOverloaded() {
+        return false;
+    }
+
+    @Override
+    public boolean canUseWhileVenting() {
+        return false;
+    }
+
+    /**
+     * Define an extra amount of time that must pass on top of default active time before the subsystem will move to the
+     * OUT stage.
+     * @param time Length of extra time to pass
+     */
+    public void setExtraActiveTime(float time) {
+        activeExtra = time;
     }
 
     public static class SubsystemData {

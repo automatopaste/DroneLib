@@ -1,0 +1,10 @@
+v1.1.2
+-added centralised subsystem hullmod queuing function to dl_SubsystemUtils
+-added useful methods to dl_BaseSubsystem
+
+v1.0.1
+-updated method documentation
+-fixed CSV merging between mods
+
+v1.0.0
+-initial release

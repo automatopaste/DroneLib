@@ -4,7 +4,6 @@ import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipwideAIFlags;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.subsystems.dl_BaseSubsystem;
-import data.scripts.util.dl_SpecLoadingUtils;
 
 import java.awt.*;
 import java.util.EnumSet;
