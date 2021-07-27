@@ -5,7 +5,6 @@ import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.subsystems.dl_BaseSubsystem;
 import data.scripts.util.dl_CombatUI;
 import data.scripts.util.dl_SubsystemUtils;
