@@ -1,6 +1,24 @@
 v1.1.0
 -added centralised subsystem hullmod queuing function to dl_SubsystemUtils
--added useful methods to dl_BaseSubsystem
+    -queueSubsystemFromHullmodForShip(ShipAPI ship, Class<? extends dl_BaseSubsystem> subsystemClass)
+    -Queues a subsystem for a ShipAPI instance so it will be applied upon entering combat. Allows subsystems to be
+     cleanly added via hullmod
+-fixed subsystem ai scripts running while player control active
+-fixed subsystem gui showing with no subsystems installed on player ship
+-added useful getter and setter methods to dl_BaseSubsystem
+    -methods such as setCooldown(float cooldown) apply changes only to the subsystem instance, it does not globally
+     change the subsystem spec data
+-added default hotkey manager, if the 'hotkey' field in the csv is left blank it will use a unique default
+    -custom hotkeys can be defined for subsystem slots 1-6, 6th slot will be copied with more subsystems
+-added static getSubsystemsOnShip(ShipAPI ship) method to dl_SubsystemCombatManager
+-added overridable methods in dl_BaseSubsystem to prevent subsystem being used while venting and/or overloaded
+-changed a couple of method names for clarity - unfortunately will cause crashes with any mods using old method names
+    -queueSubsystemFromHullmodForShip -> queueSubsystemForShip
+        -method does not require a hullmod
+    -getSystemId -> getSubsystemId
+        -clear up any confusion with regular shipsystems
+    -may have missed one or two, but nothing has been removed so the successor name should be obvious
+-updated/added javadoc comments to several methods
 
 v1.0.1
 -updated method documentation

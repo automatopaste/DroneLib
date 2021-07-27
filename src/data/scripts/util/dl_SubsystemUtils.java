@@ -26,7 +26,7 @@ public class dl_SubsystemUtils {
      * @param ship Ship to add subsystem to
      * @param subsystemClass Class of subsystem to add
      */
-    public static void queueSubsystemFromHullmodForShip(ShipAPI ship, Class<? extends dl_BaseSubsystem> subsystemClass) {
+    public static void queueSubsystemForShip(ShipAPI ship, Class<? extends dl_BaseSubsystem> subsystemClass) {
         if (ship == null || subsystemClass == null) throw new NullPointerException("ShipAPI or dl_BaseSubsystem was null");
 
         List<Class<? extends dl_BaseSubsystem>> subsystems = subsystemQueue.get(ship);

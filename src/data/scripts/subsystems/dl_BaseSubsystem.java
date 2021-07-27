@@ -82,6 +82,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     public void activate() {
         if (ship.getFluxTracker().isOverloaded() && !canUseWhileOverloaded()) return;
         if (ship.getFluxTracker().isVenting() && !canUseWhileVenting()) return;
+
         if (isOff() && !isCooldown()) {
             state = SubsystemState.IN;
         }
@@ -107,10 +108,6 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
         switch (state) {
             case OFF:
-                if (isHotkeyDown && !isHotkeyDownLastUpdate && ship.equals(Global.getCombatEngine().getPlayerShip())) {
-                    state = SubsystemState.IN;
-                }
-
                 guiLevel = 0f;
                 effectLevel = 0f;
                 active = 0f;
@@ -185,15 +182,21 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         //CombatEngineAPI engine = Global.getCombatEngine();
         //if (engine.getPlayerShip().equals(ship)) engine.maintainStatusForPlayerShip(sysId, null, getName(), state.name(), false);
 
-        if (ship.getShipAI() != null) aiUpdate(amount);
-
         isHotkeyDownLastUpdate = isHotkeyDown;
     }
 
+    /**
+     * Set the default hotkey string that will be used as a fallback if activeHotkey is not defined
+     * @param defaultHotkey Hotkey string
+     */
     public void setDefaultHotkey(String defaultHotkey) {
         this.defaultHotkey = defaultHotkey;
     }
 
+    /**
+     * Returns the currently active hotkey
+     * @return Hotkey string
+     */
     public String getActiveHotkey() {
         return activeHotkey;
     }
@@ -305,7 +308,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         private final String id;
         private final String name;
 
-        private String hotkey;
+        private final String hotkey;
 
         private float inTime;
         private float activeTime;
@@ -351,10 +354,6 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
         public String getHotkey() {
             return hotkey;
-        }
-
-        public void setHotkey(String hotkey) {
-            this.hotkey = hotkey;
         }
 
         public float getInTime() {
@@ -426,10 +425,10 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         data.setCooldownTime(cooldownTime);
     }
 
-    public void setHotkey(String hotkey) {
-        data.setHotkey(hotkey);
-    }
-
+    /**
+     * Returns hotkey string as defined in csv, will return null if none was defined
+     * @return Hotkey provided in csv entry
+     */
     public String getHotkey() {
         return data.getHotkey();
     }

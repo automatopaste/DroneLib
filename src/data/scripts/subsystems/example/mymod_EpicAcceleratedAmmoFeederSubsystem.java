@@ -4,6 +4,7 @@ import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipwideAIFlags;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.subsystems.dl_BaseSubsystem;
+import org.lazywizard.lazylib.MathUtils;
 
 import java.awt.*;
 import java.util.EnumSet;
@@ -63,6 +64,8 @@ public class mymod_EpicAcceleratedAmmoFeederSubsystem extends dl_BaseSubsystem {
     public void aiUpdate(float amount) {
         if (ship == null || !ship.isAlive()) return;
 
-        if (ship.getAIFlags().hasFlag(ShipwideAIFlags.AIFlags.MANEUVER_TARGET) && ship.getFluxLevel() < 0.8f) activate();
+        if (MathUtils.getDistance(ship, ship.getMouseTarget()) < 2000f) {
+            if (ship.getAIFlags().hasFlag(ShipwideAIFlags.AIFlags.MANEUVER_TARGET) && ship.getFluxLevel() < 0.8f) activate();
+        }
     }
 }

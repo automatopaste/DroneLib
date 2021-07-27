@@ -4,12 +4,12 @@
   },
 
   "dl_SubsystemToggleKey": "Z",
-  "dl_UseHammerheadForShowcase": false,
+  "dl_UseHammerheadForShowcase": true,
 
-  "dl_DefaultKeybind1":"G",
-  "dl_DefaultKeybind2":"H",
-  "dl_DefaultKeybind3":"J",
-  "dl_DefaultKeybind4":"N",
-  "dl_DefaultKeybind5":"M",
-  "dl_DefaultKeybind6":",",
+  "dl_DefaultKeybind1":"H",
+  "dl_DefaultKeybind2":"J",
+  "dl_DefaultKeybind3":"N",
+  "dl_DefaultKeybind4":"M",
+  "dl_DefaultKeybind5":"K",
+  "dl_DefaultKeybind6":"L",
 }

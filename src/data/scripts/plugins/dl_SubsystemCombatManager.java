@@ -100,7 +100,15 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
                 for (dl_BaseSubsystem subsystem : subsystems.get(ship)) {
                     subsystem.setIndex(index);
                     index++;
+
                     subsystem.advance(amount);
+                    if (engine.getPlayerShip().equals(ship)) {
+                        if (ship.getShipAI() != null) {
+                            subsystem.aiUpdate(amount);
+                        }
+                    } else {
+                        subsystem.aiUpdate(amount);
+                    }
                 }
             }
 
@@ -114,9 +122,6 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
         ShipAPI player = engine.getPlayerShip();
         List<dl_BaseSubsystem> s;
         if (player != null) {
-            List<String> defaultHotkeys = new ArrayList<>(dl_SpecLoadingUtils.getSubsystemHotkeyPriority());
-            Collections.reverse(defaultHotkeys);
-
             s = subsystems.get(player);
             if (s == null || s.isEmpty()) return;
 
@@ -133,11 +138,23 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
             }
 
             dl_CombatUI.drawSubsystemsTitle(engine.getPlayerShip(), showInfoText, rootLoc);
+
+            List<String> defaultHotkeys = new ArrayList<>(dl_SpecLoadingUtils.getSubsystemHotkeyPriority());
+            while (defaultHotkeys.size() < s.size()) {
+                defaultHotkeys.add(defaultHotkeys.get(5));
+            }
+            //Collections.reverse(defaultHotkeys);
+
+            for (dl_BaseSubsystem sub : s) sub.setDefaultHotkey(defaultHotkeys.get(sub.getIndex()));
         }
     }
 
     public Map<ShipAPI, List<dl_BaseSubsystem>> getSubsystems() {
         return subsystems;
+    }
+
+    public List<dl_BaseSubsystem> getSubsystemsOnShip(ShipAPI ship) {
+        return subsystems.get(ship);
     }
 
     public static Map<String, List<Class<? extends dl_BaseSubsystem>>> getSubsystemsByHullId() {

@@ -58,6 +58,8 @@ public final class dl_SpecLoadingUtils {
         SettingsAPI settings = Global.getSettings();
         JSONArray subsystems = settings.getMergedSpreadsheetDataForMod("id","data/subsystems/subsystems.csv", "dronelib");
 
+        subsystemData = new HashMap<>();
+
         for (int i = 0; i < subsystems.length(); i++) {
             JSONObject row = subsystems.getJSONObject(i);
             String id = row.getString("id");
@@ -73,8 +75,11 @@ public final class dl_SpecLoadingUtils {
             float fluxPerSecondPercentMaxCapacity = catchJsonFloatDefaultZero(row, "fluxPerSecondPercentMaxCapacity");
             float fluxPerSecondFlat = catchJsonFloatDefaultZero(row, "fluxPerSecondFlat");
 
+            String hotkey = row.getString("hotkey");
+            if (hotkey.isEmpty()) hotkey = null;
+
             dl_BaseSubsystem.SubsystemData data = new dl_BaseSubsystem.SubsystemData(
-                    row.getString("hotkey"),
+                    hotkey,
                     id,
                     row.getString("name"),
                     inTime,
