@@ -73,7 +73,6 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
     private boolean isHotkeyDownLastUpdate = false;
     private float active = 0f;
-    private float activeExtra = 0f;
     private float effectLevel = 0f;
     private float guiLevel = 0f;
 
@@ -143,7 +142,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
                 effectLevel = 1f;
 
-                if (active >= getActiveTime() + activeExtra) {
+                if (active >= getActiveTime()) {
                     state = SubsystemState.OUT;
                     active = 0f;
                 }
@@ -302,30 +301,21 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         return false;
     }
 
-    /**
-     * Define an extra amount of time that must pass on top of default active time before the subsystem will move to the
-     * OUT stage.
-     * @param time Length of extra time to pass
-     */
-    public void setExtraActiveTime(float time) {
-        activeExtra = time;
-    }
-
     public static class SubsystemData {
         private final String id;
         private final String name;
 
         private String hotkey;
 
-        private final float inTime;
-        private final float activeTime;
-        private final float outTime;
-        private final float cooldownTime;
+        private float inTime;
+        private float activeTime;
+        private float outTime;
+        private float cooldownTime;
 
         private final boolean isToggle;
 
-        private final float fluxPerSecondMaxCapacity;
-        private final float fluxPerSecondFlat;
+        private float fluxPerSecondMaxCapacity;
+        private float fluxPerSecondFlat;
 
         public SubsystemData(
                 String hotkey,
@@ -394,6 +384,46 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         public float getFluxPerSecondFlat() {
             return fluxPerSecondFlat;
         }
+
+        public void setActiveTime(float activeTime) {
+            this.activeTime = activeTime;
+        }
+
+        public void setCooldownTime(float cooldownTime) {
+            this.cooldownTime = cooldownTime;
+        }
+
+        public void setFluxPerSecondFlat(float fluxPerSecondFlat) {
+            this.fluxPerSecondFlat = fluxPerSecondFlat;
+        }
+
+        public void setFluxPerSecondMaxCapacity(float fluxPerSecondMaxCapacity) {
+            this.fluxPerSecondMaxCapacity = fluxPerSecondMaxCapacity;
+        }
+
+        public void setInTime(float inTime) {
+            this.inTime = inTime;
+        }
+
+        public void setOutTime(float outTime) {
+            this.outTime = outTime;
+        }
+    }
+
+    public void setActiveTime(float activeTime) {
+        data.setActiveTime(activeTime);
+    }
+
+    public void setInTime(float inTime) {
+        data.setInTime(inTime);
+    }
+
+    public void setOutTime(float outTime) {
+        data.setOutTime(outTime);
+    }
+
+    public void setCooldownTime(float cooldownTime) {
+        data.setCooldownTime(cooldownTime);
     }
 
     public void setHotkey(String hotkey) {
