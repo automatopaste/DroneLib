@@ -45,7 +45,7 @@ public class mymod_EpicSubsystemDroneAI extends dl_BaseSubsystemDroneAI {
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        mymod_EpicDroneSubsystem droneSubsystem = (mymod_EpicDroneSubsystem) engine.getCustomData().get(baseDroneSubsystem.getSystemID() + ship.hashCode());
+        mymod_EpicDroneSubsystem droneSubsystem = (mymod_EpicDroneSubsystem) engine.getCustomData().get(baseDroneSubsystem.getSubsystemId() + ship.hashCode());
         if (droneSubsystem == null) return;
         this.baseDroneSubsystem = droneSubsystem;
 

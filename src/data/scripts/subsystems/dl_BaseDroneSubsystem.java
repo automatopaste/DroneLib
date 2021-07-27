@@ -57,16 +57,6 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
 
     public abstract dl_BaseSubsystemDroneAI getNewDroneAIInstance(dl_DroneAPI spawnedDrone);
 
-    @Override
-    public void unapply(MutableShipStatsAPI stats, String id) {
-
-    }
-
-    @Override
-    public void apply(MutableShipStatsAPI stats, String id, SubsystemState state, float effectLevel) {
-
-    }
-
     public int getIndex(dl_DroneAPI drone) {
         int index = 0;
         for (dl_DroneAPI deployedDrone : deployedDrones) {
@@ -113,6 +103,16 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         return out;
     }
 
+    @Override
+    public void apply(MutableShipStatsAPI stats, String id, SubsystemState state, float effectLevel) {
+
+    }
+
+    @Override
+    public void unapply(MutableShipStatsAPI stats, String id) {
+
+    }
+
     //////////
     //////////
     //LAUNCH MANAGEMENT
@@ -137,7 +137,7 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         if (engine != null && ship != null) {
-            engine.getCustomData().put(getSystemID() + ship.hashCode(), this);
+            engine.getCustomData().put(getSubsystemId() + ship.hashCode(), this);
         }
 
         launchManagerAdvance(amount);
@@ -154,7 +154,7 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         float launchDelayStatMod = ship.getMutableStats().getDynamic().getMod(LAUNCH_DELAY_STAT_KEY).computeEffective(1f);
         forgeCooldown = (float) (droneSubsystemData.forgeCooldown * regenDelayStatMod);
 
-        boolean isActivationKeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getHotkeyString()));
+        boolean isActivationKeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getActiveHotkey()));
 
         int numDronesActive;
         ArrayList<dl_DroneAPI> deployedDrones;

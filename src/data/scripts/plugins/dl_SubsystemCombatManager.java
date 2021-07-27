@@ -5,9 +5,9 @@ import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.subsystems.ai.dl_BaseSubsystemAI;
 import data.scripts.subsystems.dl_BaseSubsystem;
 import data.scripts.util.dl_CombatUI;
+import data.scripts.util.dl_SpecLoadingUtils;
 import data.scripts.util.dl_SubsystemUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
@@ -113,23 +113,27 @@ public class dl_SubsystemCombatManager extends BaseEveryFrameCombatPlugin {
 
         ShipAPI player = engine.getPlayerShip();
         List<dl_BaseSubsystem> s;
-        if (player != null) s = subsystems.get(player);
-        else return;
-        if (s == null) return;
+        if (player != null) {
+            List<String> defaultHotkeys = new ArrayList<>(dl_SpecLoadingUtils.getSubsystemHotkeyPriority());
+            Collections.reverse(defaultHotkeys);
 
-        int numBars = 0;
-        for (dl_BaseSubsystem sub : s) {
-            numBars += sub.getNumGuiBars();
-            if (showInfoText) numBars++;
+            s = subsystems.get(player);
+            if (s == null || s.isEmpty()) return;
+
+            int numBars = 0;
+            for (dl_BaseSubsystem sub : s) {
+                numBars += sub.getNumGuiBars();
+                if (showInfoText) numBars++;
+            }
+            Vector2f rootLoc = dl_CombatUI.getSubsystemsRootLocation(player, numBars, 13f * Global.getSettings().getScreenScaleMult());
+
+            Vector2f inputLoc = new Vector2f(rootLoc);
+            for (dl_BaseSubsystem sub : s) {
+                inputLoc = sub.guiRender(inputLoc, rootLoc);
+            }
+
+            dl_CombatUI.drawSubsystemsTitle(engine.getPlayerShip(), showInfoText, rootLoc);
         }
-        Vector2f rootLoc = dl_CombatUI.getSubsystemsRootLocation(player, numBars, 13f * Global.getSettings().getScreenScaleMult());
-
-        Vector2f inputLoc = new Vector2f(rootLoc);
-        for (dl_BaseSubsystem sub : s) {
-            inputLoc = sub.guiRender(inputLoc, rootLoc);
-        }
-
-        dl_CombatUI.drawSubsystemsTitle(engine.getPlayerShip(), showInfoText, rootLoc);
     }
 
     public Map<ShipAPI, List<dl_BaseSubsystem>> getSubsystems() {

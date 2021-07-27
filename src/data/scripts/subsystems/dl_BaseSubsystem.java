@@ -11,7 +11,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
 public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystemAI {
-    private String sysId;
+    protected String subsystemId;
     private final SubsystemData data;
 
     public enum SubsystemState {
@@ -26,23 +26,30 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     protected ShipAPI ship;
     protected int index;
 
+    protected String activeHotkey;
+    protected String defaultHotkey;
+
     public dl_BaseSubsystem(String systemId) {
         this.data = dl_SpecLoadingUtils.getSubsystemData(systemId);
         if (data == null) throw new NullPointerException("Subsystem data is null: " + systemId);
-
-        state = SubsystemState.OFF;
     }
     public dl_BaseSubsystem(SubsystemData data) {
         this.data = data;
         if (data == null) throw new NullPointerException("Subsystem data is null");
-
-        state = SubsystemState.OFF;
+    }
+    public dl_BaseSubsystem() {
+        String id = getSubsystemId();
+        this.data = dl_SpecLoadingUtils.getSubsystemData(id);
     }
 
     @Override
     public void init(ShipAPI ship) {
         this.ship = ship;
-        sysId = "dl_Subsystem_" + this.hashCode() + "_" + ship.hashCode();
+        subsystemId = "dl_Subsystem_" + this.hashCode() + "_" + ship.hashCode();
+
+        state = SubsystemState.OFF;
+
+        if (data.hotkey != null) activeHotkey = data.hotkey;
 
         aiInit();
     }
@@ -73,7 +80,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     /**
      * Checks if activation is legal then will start subsystem cycle
      */
-    protected void activate() {
+    public void activate() {
         if (ship.getFluxTracker().isOverloaded() && !canUseWhileOverloaded()) return;
         if (ship.getFluxTracker().isVenting() && !canUseWhileVenting()) return;
         if (isOff() && !isCooldown()) {
@@ -83,13 +90,18 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
             state = SubsystemState.OUT;
             active = 0f;
         }
+
+        onActivation();
     }
 
     @Override
     public void advance(float amount) {
         if (ship == null || !ship.isAlive()) return;
 
-        boolean isHotkeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getHotkeyString()));
+        if (getActiveHotkey() == null) {
+            activeHotkey = defaultHotkey;
+        }
+        boolean isHotkeyDown = Keyboard.isKeyDown(Keyboard.getKeyIndex(getActiveHotkey()));
         if (isHotkeyDown && !isHotkeyDownLastUpdate && ship.equals(Global.getCombatEngine().getPlayerShip())) {
             activate();
         }
@@ -163,20 +175,28 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         }
 
         if (isOn()) {
-            apply(ship.getMutableStats(), sysId, state, effectLevel);
+            apply(ship.getMutableStats(), subsystemId, state, effectLevel);
 
             ship.getFluxTracker().increaseFlux(amount * getFluxPerSecondFlat(), false);
             ship.getFluxTracker().increaseFlux(amount * getFluxPerSecondMaxCapacity() * 0.01f * ship.getMaxFlux(), false);
         } else {
-            unapply(ship.getMutableStats(), sysId);
+            unapply(ship.getMutableStats(), subsystemId);
         }
 
         //CombatEngineAPI engine = Global.getCombatEngine();
         //if (engine.getPlayerShip().equals(ship)) engine.maintainStatusForPlayerShip(sysId, null, getName(), state.name(), false);
 
-        aiUpdate(amount);
+        if (ship.getShipAI() != null) aiUpdate(amount);
 
         isHotkeyDownLastUpdate = isHotkeyDown;
+    }
+
+    public void setDefaultHotkey(String defaultHotkey) {
+        this.defaultHotkey = defaultHotkey;
+    }
+
+    public String getActiveHotkey() {
+        return activeHotkey;
     }
 
     public Vector2f guiRender(Vector2f inputLoc, Vector2f rootLoc) {
@@ -221,13 +241,25 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
                 getName(),
                 info,
                 stateText,
-                getHotkeyString(),
+                getActiveHotkey(),
                 flavour,
                 dl_SubsystemCombatManager.showInfoText,
                 getNumGuiBars(),
                 inputLoc,
                 rootLoc
         );
+    }
+
+    /**
+     * Called when a subsystem successfully activates. Is also called when a toggle subsystem is turned off.
+     */
+    public void onActivation() {
+
+    }
+
+    public String getSubsystemId() {
+        if (data == null || data.getId() == null) throw new NullPointerException("Subsystem data has not been defined. You may need to override the getSubsystemId() method.");
+        return data.getId();
     }
 
     @Override
@@ -368,12 +400,8 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         data.setHotkey(hotkey);
     }
 
-    public String getHotkeyString() {
+    public String getHotkey() {
         return data.getHotkey();
-    }
-
-    public String getSystemID() {
-       return data.getId();
     }
 
     public String getName() {

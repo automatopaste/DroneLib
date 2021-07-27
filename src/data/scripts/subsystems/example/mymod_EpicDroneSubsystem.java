@@ -1,6 +1,6 @@
 package data.scripts.subsystems.example;
 
-import data.scripts.ai.dl_BaseDroneAI;
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import data.scripts.ai.dl_BaseSubsystemDroneAI;
 import data.scripts.ai.example.mymod_EpicSubsystemDroneAI;
 import data.scripts.impl.dl_DroneAPI;
@@ -20,6 +20,16 @@ public class mymod_EpicDroneSubsystem extends dl_BaseDroneSubsystem {
 
     public mymod_EpicDroneSubsystem() {
         super(dl_SpecLoadingUtils.droneSystemSpecHashMap.get("dl_fivedrones"), dl_SpecLoadingUtils.getSubsystemData(SUBSYSTEM_ID));
+    }
+
+    @Override
+    public void apply(MutableShipStatsAPI stats, String id, SubsystemState state, float effectLevel) {
+
+    }
+
+    @Override
+    public void unapply(MutableShipStatsAPI stats, String id) {
+
     }
 
     @Override

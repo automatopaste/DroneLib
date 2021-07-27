@@ -28,7 +28,7 @@ public abstract class dl_BaseSubsystemDroneAI implements ShipAIPlugin {
         this.ship = drone.getDroneSource();
 
         this.baseDroneSubsystem = baseDroneSubsystem;
-        this.uniqueSystemPrefix = baseDroneSubsystem.getSystemID();
+        this.uniqueSystemPrefix = baseDroneSubsystem.getSubsystemId();
 
         drone.getAIFlags().setFlag(ShipwideAIFlags.AIFlags.DRONE_MOTHERSHIP);
     }

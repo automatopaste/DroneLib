@@ -9,9 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author tomatopaste
@@ -20,7 +18,9 @@ import java.util.Objects;
 public final class dl_SpecLoadingUtils {
     public static Map<String, DroneSystemSpec> droneSystemSpecHashMap = new HashMap<>();
 
-    private static final HashMap<String, dl_BaseSubsystem.SubsystemData> subsystemData = new HashMap<>();
+    private static HashMap<String, dl_BaseSubsystem.SubsystemData> subsystemData;
+
+    private static final List<String> subsystemHotkeyPriority = new ArrayList<>();
 
     /**
      * @throws JSONException
@@ -88,6 +88,17 @@ public final class dl_SpecLoadingUtils {
 
             subsystemData.put(id, data);
         }
+
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind1"));
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind2"));
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind3"));
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind4"));
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind5"));
+        subsystemHotkeyPriority.add(Global.getSettings().getString("dl_DefaultKeybind6"));
+    }
+
+    public static List<String> getSubsystemHotkeyPriority() {
+        return subsystemHotkeyPriority;
     }
 
     public static dl_BaseSubsystem.SubsystemData getSubsystemData(String id) {
