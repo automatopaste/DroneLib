@@ -4,7 +4,7 @@
   },
 
   "dl_SubsystemToggleKey": "Z",
-  "dl_UseHammerheadForShowcase": true,
+  "dl_UseHammerheadForShowcase": false,
 
   "dl_DefaultKeybind1":"H",
   "dl_DefaultKeybind2":"J",
