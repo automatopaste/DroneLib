@@ -79,10 +79,16 @@ public interface dl_Subsystem {
     boolean canUseWhileVenting();
 
     /**
-     * Whether the subsystem can be used while ship is venting.
+     * Whether the subsystem can be used while ship is overloaded.
      * @return duh
      */
     boolean canUseWhileOverloaded();
+
+    /**
+     * Id of sound effect played once on activation
+     * @return ID
+     */
+    String getActivationSoundId();
 
     //todo
     //String getStatusText(int index);

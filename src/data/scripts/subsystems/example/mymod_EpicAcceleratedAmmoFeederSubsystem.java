@@ -56,6 +56,11 @@ public class mymod_EpicAcceleratedAmmoFeederSubsystem extends dl_BaseSubsystem {
     }
 
     @Override
+    public String getActivationSoundId() {
+        return "system_ammo_feeder";
+    }
+
+    @Override
     public void aiInit() {
 
     }

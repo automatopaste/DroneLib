@@ -1,6 +1,7 @@
 package data.scripts.subsystems;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.SettingsAPI;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.plugins.dl_SubsystemCombatManager;
@@ -79,7 +80,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
     /**
      * Checks if activation is legal then will start subsystem cycle
      */
-    public void activate() {
+    protected void activate() {
         if (ship.getFluxTracker().isOverloaded() && !canUseWhileOverloaded()) return;
         if (ship.getFluxTracker().isVenting() && !canUseWhileVenting()) return;
 
@@ -89,6 +90,10 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         if (isToggle() && isActive()) {
             state = SubsystemState.OUT;
             active = 0f;
+        }
+
+        if (getActivationSoundId() != null) {
+            Global.getSoundPlayer().playUISound(getActivationSoundId(), 1f, 1f);
         }
 
         onActivation();
@@ -237,6 +242,7 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
         String customStatus = getStatusString();
         if (customStatus != null) stateText = customStatus;
 
+        if (inputLoc == null) return null;
         return dl_CombatUI.drawSubsystemStatus(
                 ship,
                 guiLevel,
@@ -471,5 +477,10 @@ public abstract class dl_BaseSubsystem implements dl_Subsystem, dl_BaseSubsystem
 
     public int getIndex() {
         return index;
+    }
+
+    @Override
+    public String getActivationSoundId() {
+        return null;
     }
 }

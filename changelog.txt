@@ -1,3 +1,8 @@
+v1.1.1
+-updated to 0.95.1a
+-fixed crash opening tactical map with drone subsystem and gui active
+-added activation sfx id field to dl_BaseSubsystem, plays sound id when activated
+
 v1.1.0
 -added centralised subsystem hullmod queuing function to dl_SubsystemUtils
     -queueSubsystemFromHullmodForShip(ShipAPI ship, Class<? extends dl_BaseSubsystem> subsystemClass)

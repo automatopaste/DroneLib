@@ -88,6 +88,7 @@ public abstract class dl_BaseDroneSubsystem extends dl_BaseSubsystem {
         if (ship == null || !Global.getCombatEngine().isUIShowingHUD() || Global.getCombatEngine().isUIShowingDialog()) return new Vector2f();
 
         Vector2f out = super.guiRender(inputLoc, rootLoc);
+        if (out == null) return null;
         Vector2f in = new Vector2f(out);
         in.y += 13f * Global.getSettings().getScreenScaleMult();
         dl_CombatUI.renderAuxiliaryStatusBar(
